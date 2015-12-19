@@ -1,15 +1,17 @@
-/*
-Sample Program to use OnMouseOver effect on Skiva Home Page menu
-*/
+package flogin;
 
+import static org.testng.AssertJUnit.assertTrue;
 
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 //import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -22,6 +24,27 @@ public class OnMouseOverTest {
 		driver = new FirefoxDriver();
 		driver.get("http://skiva.com.au");
 		driver.manage().window().maximize();
+	}
+	
+	public boolean verifyText(WebDriver driver, String expText) {
+		if (expText.equals("notext"))
+			return true;
+		
+		if (driver.getPageSource().contains(expText)) {
+			System.out.println("Returning true "+expText);
+			return true;
+		} else {
+			System.out.println("Returning false "+expText);
+			return false;
+		}
+	}
+	
+	
+	public boolean verifyTitle(String actTitle,String expTitle) {
+		System.out.println("Expected title "+expTitle);
+		System.out.println("Actual title "+actTitle);
+		return actTitle.equals(expTitle);
+		
 	}
 	
 	@Test
@@ -48,6 +71,31 @@ public class OnMouseOverTest {
 		WebElement trang = driver.findElement(By.xpath(".//*[@id='menu-item-4769']/a/span"));
 		//Perform click operation by passing WebElement 'trang' and invoking perform as follows: 
 		builder.click(trang).build().perform();
+		String expectedTitle="Cloud Training - AWS (Amazon Web Services) - Skiva";
+		String expectedText="LEARN CLOUD COMPUTING";
+		
+		//verifyTitle and verifyText has been used together to decide if test case is passed
+		//Similarly other methods like pageNotFoundErr, exeptionOnPage etc could be
+		//used in one assertTrue to decide if test is passed or failed
+		Assert.assertTrue(verifyTitle(driver.getTitle(),expectedTitle) & verifyText(driver,expectedText));
+					
+		
+	}
+	
+	//you can get the result of your test in your @AfterTest method via ITestResult result
+        //ITestResult provides many methods like getName and getStatus. 
+	//These can be used for better logging and reporting of executed test cases
+	@AfterMethod
+	public void tearDown(ITestResult result) {
+		//getName provides the test method name
+		String tName = result.getName();
+		System.out.println("Invoking Teardown for Test = "+tName);
+		if(result.getStatus()==ITestResult.FAILURE)
+		{
+			System.out.println("Test Case "+tName+" FAILED");
+		} else {
+			System.out.println("Test Case "+tName+" PASSED");
+		}
 		
 	}
 	
